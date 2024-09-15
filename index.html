@@ -1,84 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Music Player with Spotify</title>
     <link rel="stylesheet" href="style.css" />
     <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
     />
-</head>
-<body>
+  </head>
+  <body>
     <div class="dynamic-background" id="dynamic-background">
-        <img id="background-album-art" src="" alt="Background Album Art" />
+      <img id="background-album-art" src="" alt="Background Album Art" />
+    </div>
+
+    <div class="navbar">
+      <div id="user-profile" class="user-profile hidden">
+        <img
+          id="user-profile-picture"
+          src="default-profile.png"
+          alt="User P P"
+        />
+        <div class="user-info">
+          <p id="user-name"></p>
+          <p id="user-email"></p>
+        </div>
+        <button id="logout" class="primary-btn logout-btn hidden">
+          Logout
+        </button>
+      </div>
+
+      <div class="service-buttons" id="service-buttons">
+        <button id="spotify-login" class="primary-btn spotify-btn">
+          <i class="fab fa-spotify"></i> Login with Spotify
+        </button>
+      </div>
     </div>
 
     <div class="music-player">
-        <nav class="navbar">
-            <div class="profile-info" id="profile-info">
-                <img
-                    id="user-profile-picture"
-                    src="default-profile.png"
-                    alt="User Profile Picture"
-                    class="hidden"
-                />
-                <div id="user-details" class="user-info hidden">
-                    <p id="user-name"></p>
-                    <p id="user-email"></p>
-                </div>
-            </div>
-            <div id="nav-buttons">
-                <button id="spotify-login" class="primary-btn spotify-btn">
-                    <i class="fab fa-spotify"></i> Login with Spotify
-                </button>
-                <button id="logout" class="primary-btn hidden">Logout</button>
-            </div>
-        </nav>
+      <div class="notification" id="notification"></div>
 
-        <div class="notification" id="notification"></div>
+      <div class="album-art-container">
+        <img id="album-art" src="default-album.png" alt="Album Art" />
+      </div>
 
-        <div class="album-art-container">
-            <img id="album-art" src="default-album.png" alt="Album Art" />
-        </div>
+      <div class="player-controls">
+        <button
+          id="prev"
+          class="control-btn"
+          aria-label="Previous"
+          title="Previous"
+        >
+          <i class="fas fa-step-backward"></i>
+        </button>
+        <button
+          id="play-pause"
+          class="control-btn"
+          aria-label="Play"
+          title="Play"
+        >
+          <i class="fas fa-play"></i>
+        </button>
+        <button id="next" class="control-btn" aria-label="Next" title="Next">
+          <i class="fas fa-step-forward"></i>
+        </button>
+      </div>
 
-        <div class="player-controls">
-            <button
-                id="prev"
-                class="control-btn"
-                aria-label="Previous"
-                title="Previous"
-            >
-                <i class="fas fa-step-backward"></i>
-            </button>
-            <button
-                id="play-pause"
-                class="control-btn"
-                aria-label="Play"
-                title="Play"
-            >
-                <i class="fas fa-play"></i>
-            </button>
-            <button id="next" class="control-btn" aria-label="Next" title="Next">
-                <i class="fas fa-step-forward"></i>
-            </button>
-        </div>
+      <div class="song-info">
+        <h2 id="song-title" aria-live="polite">Song Title</h2>
+      </div>
 
-        <div class="song-info">
-            <h2 id="song-title" aria-live="polite">Song Title</h2>
-        </div>
-
-        <div class="equalizer" id="equalizer">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-        </div>
+      <div class="equalizer" id="equalizer">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
     </div>
 
     <script src="https://unpkg.com/node-vibrant/dist/vibrant.min.js"></script>
+
     <script src="script.js"></script>
-</body>
+  </body>
 </html>

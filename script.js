@@ -23,8 +23,7 @@ const userProfilePicture = document.getElementById("user-profile-picture");
 const userNameElement = document.getElementById("user-name");
 const userEmailElement = document.getElementById("user-email");
 const logoutBtn = document.getElementById("logout");
-const profileInfo = document.getElementById("profile-info");
-const userDetails = document.getElementById("user-details");
+const userProfileSection = document.getElementById("user-profile");
 
 function showNotification(message) {
   notification.textContent = message;
@@ -88,11 +87,9 @@ function displayUserProfile(user) {
     userProfilePicture.src = "default-profile.png";
   }
 
-  userProfilePicture.classList.remove("hidden");
-  userDetails.classList.remove("hidden");
-
-  spotifyLoginBtn.classList.add("hidden");
+  userProfileSection.classList.remove("hidden");
   logoutBtn.classList.remove("hidden");
+  spotifyLoginBtn.classList.add("hidden");
 }
 
 function initializeSpotify() {
@@ -112,10 +109,9 @@ logoutBtn.addEventListener("click", () => {
   accessToken = "";
   isUserLoggedIn = false;
 
-  userProfilePicture.classList.add("hidden");
-  userDetails.classList.add("hidden");
-  spotifyLoginBtn.classList.remove("hidden");
+  userProfileSection.classList.add("hidden");
   logoutBtn.classList.add("hidden");
+  spotifyLoginBtn.classList.remove("hidden");
 
   showNotification("Logged out successfully.");
 });
