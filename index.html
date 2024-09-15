@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Couch to Coder II Music Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="music-player">
+      <button id="spotify-login" class="primary-btn">Login with Spotify</button>
+      
+      <div class="notification" id="notification"></div> 
+
+      <div class="player-controls">
+        <button id="prev" class="control-btn" aria-label="Previous" title="Previous">
+          <i class="fas fa-step-backward"></i>
+        </button>
+        <button id="play-pause" class="control-btn" aria-label="Play" title="Play">
+          <i class="fas fa-play"></i>
+        </button>
+        <button id="next" class="control-btn" aria-label="Next" title="Next">
+          <i class="fas fa-step-forward"></i>
+        </button>
+      </div>
+
+      <div class="song-info">
+        <h2 id="song-title" aria-live="polite">Song Title</h2>
+      </div>
+
+      <div class="equalizer">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+
+      <div class="lyrics-section">
+        <h3>Lyrics</h3>
+        <div id="lyrics-content">No lyrics available</div>
+      </div>
+      
+
+      <div class="album-art">
+        <img id="album-image" src="default-album.png" alt="Album Art">
+      </div>
+      
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
