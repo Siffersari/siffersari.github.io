@@ -16,8 +16,15 @@ const nextBtn = document.getElementById("next");
 const songTitle = document.getElementById("song-title");
 const notification = document.getElementById("notification");
 const spotifyLoginBtn = document.getElementById("spotify-login");
-const appleLoginBtn = document.getElementById("apple-login");
-const deezerLoginBtn = document.getElementById("deezer-login");
+const albumArt = document.getElementById("album-art");
+const backgroundAlbumArt = document.getElementById("background-album-art");
+const equalizerBars = document.querySelectorAll(".equalizer .bar");
+const userProfileSection = document.getElementById("user-profile");
+const userNameElement = document.getElementById("user-name");
+const userEmailElement = document.getElementById("user-email");
+const userProfilePicture = document.getElementById("user-profile-picture");
+const logoutBtn = document.getElementById("logout");
+const serviceButtons = document.getElementById("service-buttons");
 
 function showNotification(message) {
   notification.textContent = message;
@@ -49,10 +56,39 @@ function getAccessToken() {
   return params.get("access_token");
 }
 
-function isAccessTokenExpired() {
-  if (!tokenExpiresAt) return true;
-  const currentTime = new Date().getTime();
-  return currentTime >= tokenExpiresAt;
+async function fetchUserProfile() {
+  try {
+    const response = await fetch("https://api.spotify.com/v1/me", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.status === 401) {
+      showNotification("Access token expired. Reauthorizing...");
+      authorizeSpotify();
+      return;
+    }
+
+    const data = await response.json();
+    displayUserProfile(data);
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    showNotification("Error fetching user profile.");
+  }
+}
+
+function displayUserProfile(user) {
+  userNameElement.textContent = user.display_name;
+  userEmailElement.textContent = user.email;
+  if (user.images && user.images.length > 0) {
+    userProfilePicture.src = user.images[0].url;
+  } else {
+    userProfilePicture.src = "default-profile.png";
+  }
+
+  userProfileSection.classList.remove("hidden");
+  serviceButtons.classList.add("hidden");
 }
 
 function initializeSpotify() {
@@ -60,12 +96,21 @@ function initializeSpotify() {
   if (accessToken) {
     tokenExpiresAt = new Date().getTime() + 3600 * 1000;
     isUserLoggedIn = true;
+    fetchUserProfile();
     setupSpotifyPlayer();
     fetchUserPlaylists();
   } else {
     showNotification("Please log in with Spotify to play music.");
   }
 }
+
+logoutBtn.addEventListener("click", () => {
+  accessToken = "";
+  isUserLoggedIn = false;
+  userProfileSection.classList.add("hidden");
+  serviceButtons.classList.remove("hidden");
+  showNotification("Logged out successfully.");
+});
 
 function setupSpotifyPlayer() {
   window.onSpotifyWebPlaybackSDKReady = () => {
@@ -120,6 +165,11 @@ function setupSpotifyPlayer() {
 }
 
 async function fetchUserPlaylists() {
+  if (!isUserLoggedIn) {
+    showNotification("Please log in to Spotify to fetch playlists.");
+    return;
+  }
+
   try {
     const response = await fetch("https://api.spotify.com/v1/me/playlists", {
       headers: {
@@ -147,6 +197,11 @@ async function fetchUserPlaylists() {
 }
 
 async function fetchPlaylistTracks(playlistId) {
+  if (!isUserLoggedIn) {
+    showNotification("Please log in to Spotify to fetch tracks.");
+    return;
+  }
+
   try {
     const response = await fetch(
       `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
@@ -165,24 +220,71 @@ async function fetchPlaylistTracks(playlistId) {
 
     const data = await response.json();
     tracks = data.items.map((item) => item.track);
-    updateSongTitle();
+    updateSongInfo();
   } catch (error) {
     console.error("Error fetching playlist tracks:", error);
     showNotification("Error fetching playlist tracks.");
   }
 }
 
-function updateSongTitle() {
+function updateSongInfo() {
   if (tracks.length > 0) {
-    songTitle.textContent = tracks[currentTrackIndex].name;
+    const track = tracks[currentTrackIndex];
+    songTitle.textContent = track.name;
+
+    if (track.album && track.album.images && track.album.images.length > 0) {
+      albumArt.src = track.album.images[0].url;
+      albumArt.alt = `Album art for ${track.name}`;
+
+      backgroundAlbumArt.src = track.album.images[0].url;
+      backgroundAlbumArt.alt = `Background album art for ${track.name}`;
+
+      albumArt.onload = function () {
+        Vibrant.from(albumArt)
+          .getPalette()
+          .then((palette) => {
+            const vibrantColor = palette.Vibrant
+              ? palette.Vibrant.getHex()
+              : "#1db954";
+            applyDynamicStyles(vibrantColor);
+          })
+          .catch((err) => {
+            console.error("Error extracting colors:", err);
+            resetDynamicStyles();
+          });
+      };
+    } else {
+      albumArt.src = "default-album.png";
+      albumArt.alt = "Default album art";
+      backgroundAlbumArt.src = "default-album.png";
+      backgroundAlbumArt.alt = "Default album art";
+      resetDynamicStyles();
+    }
   } else {
     songTitle.textContent = "No tracks available";
+    albumArt.src = "default-album.png";
+    albumArt.alt = "Default album art";
+    backgroundAlbumArt.src = "default-album.png";
+    backgroundAlbumArt.alt = "Default album art";
+    resetDynamicStyles();
   }
+}
+
+function applyDynamicStyles(primaryColor) {
+  equalizerBars.forEach((bar) => {
+    bar.style.backgroundColor = primaryColor;
+  });
+}
+
+function resetDynamicStyles() {
+  equalizerBars.forEach((bar) => {
+    bar.style.backgroundColor = "#1db954";
+  });
 }
 
 playPauseBtn.addEventListener("click", () => {
   if (!isUserLoggedIn) {
-    showNotification("Please select a music service to log in.");
+    showNotification("Please log in with Spotify to play.");
     return;
   }
   if (isPlaying) {
@@ -194,30 +296,30 @@ playPauseBtn.addEventListener("click", () => {
 
 prevBtn.addEventListener("click", () => {
   if (!isUserLoggedIn) {
-    showNotification("Please select a music service to log in.");
+    showNotification("Please log in with Spotify to play.");
     return;
   }
   if (tracks.length === 0) return;
   currentTrackIndex = (currentTrackIndex - 1 + tracks.length) % tracks.length;
-  updateSongTitle();
+  updateSongInfo();
   playSong();
 });
 
 nextBtn.addEventListener("click", () => {
   if (!isUserLoggedIn) {
-    showNotification("Please select a music service to log in.");
+    showNotification("Please log in with Spotify to play.");
     return;
   }
   if (tracks.length === 0) return;
   currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-  updateSongTitle();
+  updateSongInfo();
   playSong();
 });
 
 async function playSong() {
   if (!accessToken || !player || !deviceId || tracks.length === 0) {
     showNotification(
-      "Unable to play song. Please check your connection and try again."
+      "Unable to play song. Please ensure you are logged in and try again."
     );
     return;
   }
