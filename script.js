@@ -24,6 +24,23 @@ const userNameElement = document.getElementById("user-name");
 const userEmailElement = document.getElementById("user-email");
 const logoutBtn = document.getElementById("logout");
 const userProfileSection = document.getElementById("user-profile");
+const searchInput = document.getElementById("search-input");
+const searchButton = document.getElementById("search-button");
+const videoContainer = document.getElementById("video-container");
+const musicVideo = document.getElementById("music-video");
+const videoSource = document.getElementById("video-source");
+const albumArtContainer = document.getElementById("album-art-container");
+
+const archetypeImages = [
+  "archetypes/animal1.png",
+  "archetypes/mood1.png",
+  "archetypes/scientist1.png",
+  "archetypes/ninja1.png",
+  "archetypes/animal2.png",
+  "archetypes/mood2.png",
+  "archetypes/scientist2.png",
+  "archetypes/ninja2.png",
+];
 
 function showNotification(message) {
   notification.textContent = message;
@@ -42,6 +59,7 @@ function authorizeSpotify() {
     "streaming",
     "user-modify-playback-state",
     "user-read-playback-state",
+    "user-library-read",
   ];
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(
     redirectUri
@@ -84,7 +102,8 @@ function displayUserProfile(user) {
   if (user.images && user.images.length > 0) {
     userProfilePicture.src = user.images[0].url;
   } else {
-    userProfilePicture.src = "default-profile.png";
+    const randomIndex = Math.floor(Math.random() * archetypeImages.length);
+    userProfilePicture.src = archetypeImages[randomIndex];
   }
 
   userProfileSection.classList.remove("hidden");
@@ -224,10 +243,45 @@ async function fetchPlaylistTracks(playlistId) {
 
     const data = await response.json();
     tracks = data.items.map((item) => item.track);
+    currentTrackIndex = 0;
     updateSongInfo();
   } catch (error) {
     console.error("Error fetching playlist tracks:", error);
     showNotification("Error fetching playlist tracks.");
+  }
+}
+
+async function searchTracks(query) {
+  if (!isUserLoggedIn) {
+    showNotification("Please log in to Spotify to search tracks.");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `https://api.spotify.com/v1/search?type=track&limit=20&q=${encodeURIComponent(
+        query
+      )}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (response.status === 401) {
+      showNotification("Access token expired. Reauthorizing...");
+      authorizeSpotify();
+      return;
+    }
+
+    const data = await response.json();
+    tracks = data.tracks.items;
+    currentTrackIndex = 0;
+    updateSongInfo();
+  } catch (error) {
+    console.error("Error searching tracks:", error);
+    showNotification("Error searching tracks.");
   }
 }
 
@@ -264,6 +318,16 @@ function updateSongInfo() {
       backgroundAlbumArt.alt = "Default album art";
       resetDynamicStyles();
     }
+
+    if (track.video_url) {
+      videoSource.src = track.video_url;
+      videoContainer.classList.remove("hidden");
+      albumArtContainer.classList.add("hidden");
+      musicVideo.load();
+    } else {
+      videoContainer.classList.add("hidden");
+      albumArtContainer.classList.remove("hidden");
+    }
   } else {
     songTitle.textContent = "No tracks available";
     albumArt.src = "default-album.png";
@@ -271,6 +335,8 @@ function updateSongInfo() {
     backgroundAlbumArt.src = "default-album.png";
     backgroundAlbumArt.alt = "Default album art";
     resetDynamicStyles();
+    videoContainer.classList.add("hidden");
+    albumArtContainer.classList.remove("hidden");
   }
 }
 
@@ -359,6 +425,10 @@ async function playSong() {
 
     isPlaying = true;
     playPauseBtn.querySelector("i").classList = "fas fa-pause";
+
+    if (tracks[currentTrackIndex].video_url) {
+      musicVideo.play();
+    }
   } catch (error) {
     console.error("Error playing track:", error);
     showNotification("Error playing track.");
@@ -386,6 +456,10 @@ async function pauseSong() {
 
     isPlaying = false;
     playPauseBtn.querySelector("i").classList = "fas fa-play";
+
+    if (musicVideo && !musicVideo.paused) {
+      musicVideo.pause();
+    }
   } catch (error) {
     console.error("Error pausing track:", error);
     showNotification("Error pausing track.");
@@ -394,6 +468,13 @@ async function pauseSong() {
 
 spotifyLoginBtn.addEventListener("click", () => {
   authorizeSpotify();
+});
+
+searchButton.addEventListener("click", () => {
+  const query = searchInput.value.trim();
+  if (query) {
+    searchTracks(query);
+  }
 });
 
 initializeSpotify();

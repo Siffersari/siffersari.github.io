@@ -3,11 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Music Player with Spotify</title>
+    <title>Couch to Coder Music Player with Spotify</title>
     <link rel="stylesheet" href="style.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
     />
   </head>
   <body>
@@ -16,32 +22,42 @@
     </div>
 
     <div class="navbar">
-      <div id="user-profile" class="user-profile hidden">
-        <img
-          id="user-profile-picture"
-          src="default-profile.png"
-          alt="User P P"
+      <div class="logo">MyMusicApp</div>
+      <div class="search-bar">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search for songs or artists..."
         />
-        <div class="user-info">
-          <p id="user-name"></p>
-          <p id="user-email"></p>
+        <button id="search-button"><i class="fas fa-search"></i></button>
+      </div>
+      <div class="user-section">
+        <div id="user-profile" class="user-profile hidden">
+          <img
+            id="user-profile-picture"
+            src="default-profile.png"
+            alt="User Profile Picture"
+          />
+          <div class="user-info">
+            <p id="user-name"></p>
+            <p id="user-email"></p>
+          </div>
         </div>
         <button id="logout" class="primary-btn logout-btn hidden">
           Logout
         </button>
-      </div>
-
-      <div class="service-buttons" id="service-buttons">
-        <button id="spotify-login" class="primary-btn spotify-btn">
-          <i class="fab fa-spotify"></i> Login with Spotify
-        </button>
+        <div class="service-buttons" id="service-buttons">
+          <button id="spotify-login" class="primary-btn spotify-btn">
+            <i class="fab fa-spotify"></i> Login with Spotify
+          </button>
+        </div>
       </div>
     </div>
 
     <div class="music-player">
       <div class="notification" id="notification"></div>
 
-      <div class="album-art-container">
+      <div class="album-art-container" id="album-art-container">
         <img id="album-art" src="default-album.png" alt="Album Art" />
       </div>
 
