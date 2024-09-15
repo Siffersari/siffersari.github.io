@@ -19,12 +19,12 @@ const spotifyLoginBtn = document.getElementById("spotify-login");
 const albumArt = document.getElementById("album-art");
 const backgroundAlbumArt = document.getElementById("background-album-art");
 const equalizerBars = document.querySelectorAll(".equalizer .bar");
-const userProfileSection = document.getElementById("user-profile");
+const userProfilePicture = document.getElementById("user-profile-picture");
 const userNameElement = document.getElementById("user-name");
 const userEmailElement = document.getElementById("user-email");
-const userProfilePicture = document.getElementById("user-profile-picture");
 const logoutBtn = document.getElementById("logout");
-const serviceButtons = document.getElementById("service-buttons");
+const profileInfo = document.getElementById("profile-info");
+const userDetails = document.getElementById("user-details");
 
 function showNotification(message) {
   notification.textContent = message;
@@ -81,14 +81,18 @@ async function fetchUserProfile() {
 function displayUserProfile(user) {
   userNameElement.textContent = user.display_name;
   userEmailElement.textContent = user.email;
+
   if (user.images && user.images.length > 0) {
     userProfilePicture.src = user.images[0].url;
   } else {
     userProfilePicture.src = "default-profile.png";
   }
 
-  userProfileSection.classList.remove("hidden");
-  serviceButtons.classList.add("hidden");
+  userProfilePicture.classList.remove("hidden");
+  userDetails.classList.remove("hidden");
+
+  spotifyLoginBtn.classList.add("hidden");
+  logoutBtn.classList.remove("hidden");
 }
 
 function initializeSpotify() {
@@ -107,8 +111,12 @@ function initializeSpotify() {
 logoutBtn.addEventListener("click", () => {
   accessToken = "";
   isUserLoggedIn = false;
-  userProfileSection.classList.add("hidden");
-  serviceButtons.classList.remove("hidden");
+
+  userProfilePicture.classList.add("hidden");
+  userDetails.classList.add("hidden");
+  spotifyLoginBtn.classList.remove("hidden");
+  logoutBtn.classList.add("hidden");
+
   showNotification("Logged out successfully.");
 });
 
