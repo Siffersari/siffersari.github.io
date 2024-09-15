@@ -1,5 +1,7 @@
 const clientId = "b95a0b7b6fb34b6883dad6a8a8ddadc3";
-const redirectUri = "http://127.0.0.1:5500/index.html";
+const redirectUri = "https://siffersari.github.io/index.html";
+
+const YOUTUBE_API_KEY = "AIzaSyBrfrcrCnHF9ZjtaDtFE2Q4A0FTFd-z9qI";
 
 let accessToken = "";
 let tokenExpiresAt = null;
@@ -27,6 +29,8 @@ const userProfileSection = document.getElementById("user-profile");
 const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const albumArtContainer = document.getElementById("album-art-container");
+const videoContainer = document.getElementById("video-container");
+const youtubePlayer = document.getElementById("youtube-player");
 
 function showNotification(message) {
   notification.textContent = message;
@@ -321,6 +325,8 @@ function updateSongInfo() {
       backgroundAlbumArt.alt = "Default album art";
       resetDynamicStyles();
     }
+
+    searchAndDisplayYouTubeVideo(track);
   } else {
     songTitle.textContent = "No tracks available";
     albumArt.src = "default-album.png";
@@ -328,6 +334,7 @@ function updateSongInfo() {
     backgroundAlbumArt.src = "default-album.png";
     backgroundAlbumArt.alt = "Default album art";
     resetDynamicStyles();
+    hideYouTubePlayer();
   }
 }
 
@@ -454,3 +461,36 @@ spotifyLoginBtn.addEventListener("click", () => {
 });
 
 initializeSpotify();
+
+async function searchAndDisplayYouTubeVideo(track) {
+  const query = `${track.name} ${track.artists[0].name} official music video`;
+  try {
+    const response = await fetch(
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${encodeURIComponent(
+        query
+      )}&type=video&videoCategoryId=10&key=${YOUTUBE_API_KEY}`
+    );
+    const data = await response.json();
+    if (data.items && data.items.length > 0) {
+      const videoId = data.items[0].id.videoId;
+      displayYouTubePlayer(videoId);
+    } else {
+      hideYouTubePlayer();
+    }
+  } catch (error) {
+    console.error("Error fetching YouTube video:", error);
+    hideYouTubePlayer();
+  }
+}
+
+function displayYouTubePlayer(videoId) {
+  youtubePlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`;
+  videoContainer.classList.remove("hidden");
+  albumArtContainer.classList.add("hidden");
+}
+
+function hideYouTubePlayer() {
+  youtubePlayer.src = "";
+  videoContainer.classList.add("hidden");
+  albumArtContainer.classList.remove("hidden");
+}
