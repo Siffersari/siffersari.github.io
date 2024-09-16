@@ -466,9 +466,9 @@ async function searchAndDisplayYouTubeVideo(track) {
   const query = `${track.name} ${track.artists[0].name} official music video`;
   try {
     const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${encodeURIComponent(
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&type=video&q=${encodeURIComponent(
         query
-      )}&type=video&videoCategoryId=10&key=${YOUTUBE_API_KEY}`
+      )}&key=${YOUTUBE_API_KEY}`
     );
     const data = await response.json();
     if (data.items && data.items.length > 0) {
@@ -484,7 +484,7 @@ async function searchAndDisplayYouTubeVideo(track) {
 }
 
 function displayYouTubePlayer(videoId) {
-  youtubePlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`;
+  youtubePlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&enablejsapi=1`;
   videoContainer.classList.remove("hidden");
   albumArtContainer.classList.add("hidden");
 }
